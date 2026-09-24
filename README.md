@@ -17,3 +17,12 @@ Personal AI agent project that searches flight prices using Python.
 - [ ] Turn flight search into a tool the agent can call
 - [ ] Add persistent memory for tracked routes/prices
 - [ ] Add scheduled price checks with alerts
+
+## Known limitations
+This project uses `fast-flights`, which scrapes Google Flights instead of
+using an official API. This means:
+- Results may not always match what you see in your own browser (Google
+  personalizes results per session)
+- The library can break if Google changes its internal structure
+- Prices should always be verified on the actual Google Flights link
+  before booking
