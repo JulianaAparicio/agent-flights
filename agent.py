@@ -30,9 +30,10 @@ AVAILABLE_FUNCTIONS = {
 }
 
 
-def ask_agent(user_message):
+def ask_agent(messages):
     print("[DEBUG] Starting ask_agent...")
-    messages = [{"role": "user", "content": user_message}]
+    # "messages" now comes in already built, containing the full
+    # conversation history so far (not just the latest question).
 
     print("[DEBUG] Sending first request to Ollama...")
     response = requests.post(OLLAMA_URL, json={
@@ -82,13 +83,31 @@ def ask_agent(user_message):
     return final_response.json()["message"]["content"]
 
 
-if __name__ == "__main__":
-    pregunta = "What's the cheapest round trip flight from Miami to Buenos Aires, leaving December 11 2026 and returning January 3 2027?"
+def run_conversation():
+    # This list holds the ENTIRE conversation, not just one message.
+    # Every time we send something to Ollama, we send this whole history,
+    # so the model has context from earlier in the chat.
+    conversation_history = []
 
-    try:
-        respuesta = ask_agent(pregunta)
-        print("\nFinal answer:")
-        print(respuesta)
-    except Exception as e:
-        print("\n[ERROR] Something went wrong:")
-        traceback.print_exc()
+    print("Flight Agent ready. Ask me about flights (type 'quit' to exit).\n")
+
+    while True:
+        user_input = input("You: ")
+
+        if user_input.lower() in ["quit", "exit", "salir"]:
+            print("Goodbye!")
+            break
+
+        conversation_history.append({"role": "user", "content": user_input})
+
+        try:
+            reply = ask_agent(conversation_history)
+            print(f"\nAgent: {reply}\n")
+            conversation_history.append({"role": "assistant", "content": reply})
+        except Exception:
+            print("\n[ERROR] Something went wrong:")
+            traceback.print_exc()
+
+
+if __name__ == "__main__":
+    run_conversation()
